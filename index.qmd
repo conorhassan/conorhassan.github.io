@@ -1,0 +1,16 @@
+---
+title: "About"
+---
+
+![](mug.jpeg){style="float:right; width:200px; margin:10px; padding:5px;"}
+
+**<span style="color: #FF0000;">LOOKING FOR OPPORTUNITIES:</span> I am looking for postdoctoral roles or positions as a research data scientist or in applied research. My preferred location is Europe and I am available from July 2024.** I am interested in working in areas related to privacy-enhancing technologies or in applying statistical and machine learning methods to scientific applications. My interests span  tackling methodological problems to development of software to applying existing methods to interesting problems. **Contact me at [conordaniel.hassan@hdr.qut.edu.au](conordaniel.hassan@hdr.qut.edu.au).**
+
+Currently, I am a PhD student at the [QUT Centre for Data Science](https://www.google.com) (in Brisbane, Australia), working with Distinguished Professor [Kerrie Mengersen](https://research.qut.edu.au/qutcds/staff/kerrie-mengersen/) on methods for [*Bayesian federated learning*](https://arxiv.org/abs/2302.03314) and [*differentially private generative models*](https://arxiv.org/abs/2307.15424).
+
+My research research spans a variety of methods and areas, including variational inference, data-augmentation schemes, score-matching, generative models, differential privacy, federated learning, latent factor models, and Gaussian processes.  I am well-versed in using automatic differentiation libraries like *JAX* and *PyTorch*, as well as probabilistic programming libraries such as *NumPyro*, *PyMC*, *Pyro*, and *Stan*.
+
+In the past, I have worked as a research data scientist at [WearOptimo](https://www.wearoptimo.com/), a biotechnology startup developing microwearable devices, and completed internships in [quantitative trading](https://www.imc.com/), [consulting](https://ey.com) and at a [national scientific institute](https://www.agresearch.co.nz/). I have also worked as a research assistant and tutored seven courses in mathematics and statistics, from beginner to Master's level. 
+
+Contact me at [conordaniel.hassan@hdr.qut.edu.au](conordaniel.hassan@hdr.qut.edu.au) and connect with me on [LinkedIn](https://www.linkedin.com/in/conorhassan/), [X](https://twitter.com/HassanConor), and [GitHub](https://github.com/conorhassan)!
+

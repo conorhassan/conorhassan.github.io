@@ -1,0 +1,47 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Conor Hassan"
+  description: "Statistics and Machine Learning Researcher"
+  image: mug.jpeg
+
+  navbar:
+    logo: mug.jpeg
+    left:
+      - href: about.qmd
+        text: About
+      - href: publications.qmd
+        text: Publications
+      - href: resume.qmd
+        text: Resume
+    right:
+      - icon: github
+        href: https://github.com/conorhassan
+      - icon: twitter
+        href: https://twitter.com/HassanConor
+      - icon: linkedin
+        href: https://www.linkedin.com/in/conorhassan/
+      - text: "{{< iconify academicons google-scholar-square >}}"
+        href: https://scholar.google.com.au/citations?user=l-eA0gsAAAAJ&hl=en
+
+  page-footer:
+    background: light
+    center:
+      - icon: github
+        href: https://github.com/conorhassan
+      - icon: twitter
+        href: https://twitter.com/HassanConor
+      - icon: linkedin
+        href: https://www.linkedin.com/in/conorhassan/
+      - text: "{{< iconify academicons google-scholar-square >}}"
+        href: https://scholar.google.com.au/citations?user=l-eA0gsAAAAJ&hl=en
+format:
+  html:
+    theme: pulse
+    css: styles.css
+    toc: true
+
+
+

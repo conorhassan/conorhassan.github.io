@@ -1,0 +1,13 @@
+---
+title: "Publications"
+---
+
+- **Conor Hassan**, Robert Salomone, and Kerrie Mengersen. *"Federated Variational Inference Methods for Structured Latent Variable Models."* arXiv preprint arXiv:2302.03314 (2023). Under review.
+
+- **Conor Hassan**, Robert Salomone, and Kerrie Mengersen. *"Deep Generative Models, Synthetic Tabular Data, and Differential Privacy: An Overview and Synthesis."* arXiv preprint arXiv:2307.15424 (2023).
+
+- **Conor Hassan**, et al. *"Deep Generative Priors for Dependent Data Federated Learning."* In preparation.  
+
+- **Conor Hassan**, et al. *"Bayesian Vertical Federated Learning via Data Augmentation."* In preparation.
+
+- Joshua J. Bon, et al. *"Being Bayesian in the 2020s: opportunities and challenges in the practice of modern applied Bayesian statistics."*  Philosophical Transactions of the Royal Society A (2023).  Accepted for publication.
