@@ -8,7 +8,7 @@ title: "About"
 
 Currently, I am a PhD student at the [QUT Centre for Data Science](https://research.qut.edu.au/qutcds/) (in Brisbane, Australia), working with Distinguished Professor [Kerrie Mengersen](https://research.qut.edu.au/qutcds/staff/kerrie-mengersen/) on methods for [*Bayesian federated learning*](https://arxiv.org/abs/2302.03314) and [*differentially private generative models*](https://arxiv.org/abs/2307.15424).
 
-My research research spans a variety of methods and areas, including variational inference, data-augmentation schemes, score-matching, generative models, differential privacy, federated learning, latent factor models, and Gaussian processes.  I am well-versed in using automatic differentiation libraries like *JAX* and *PyTorch*, as well as probabilistic programming libraries such as *NumPyro*, *PyMC*, *Pyro*, and *Stan*.
+My research spans a variety of methods and areas, including variational inference, data-augmentation schemes, score-matching, generative models, differential privacy, federated learning, latent factor models, and Gaussian processes.  I am well-versed in using automatic differentiation libraries like *JAX* and *PyTorch*, as well as probabilistic programming libraries such as *NumPyro*, *PyMC*, *Pyro*, and *Stan*.
 
 In the past, I have worked as a research data scientist at [WearOptimo](https://www.wearoptimo.com/), a biotechnology startup developing microwearable devices, and completed internships in [quantitative trading](https://www.imc.com/), [consulting](https://ey.com) and at a [national scientific institute](https://www.agresearch.co.nz/). I have also worked as a research assistant and tutored seven courses in mathematics and statistics, from beginner to Master's level. 
 
