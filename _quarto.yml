@@ -16,7 +16,6 @@ website:
         text: Publications
       - href: resume.qmd
         text: Resume
-      - href: 
     right:
       - icon: github
         href: https://github.com/conorhassan
