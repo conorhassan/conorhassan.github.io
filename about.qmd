@@ -6,7 +6,7 @@ title: "About"
 
 I am a PhD student at the [QUT Centre for Data Science](https://research.qut.edu.au/qutcds/) (in Brisbane, Australia) working with Distinguished Professor [Kerrie Mengersen](https://research.qut.edu.au/qutcds/staff/kerrie-mengersen/) on methods for [*Bayesian federated learning*](https://arxiv.org/abs/2302.03314) and [*differentially private generative models*](https://arxiv.org/abs/2307.15424). My thesis is currently under internal review. 
 
-From May to November 2024, I am relocating to Melbourne to complete an internship with the machine learning research team at Amazon. In December, I am moving to Finland to begin a postdoctoral position with Professor [Sami Kaski](https://kaski-lab.com/) and others at [Aalto University](https://www.aalto.fi/en) (affiliated with the [Probabilistic Machine Learning group](https://research.cs.aalto.fi/pml/) and [FCAI](https://fcai.fi/). 
+From May to November 2024, I am relocating to Melbourne to complete an internship with the machine learning research team at Amazon.
 
 My research interests include variational inference, generative models, federated and distributed algorithms, latent-variable models, and Bayesian deep learning.
 
