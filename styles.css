@@ -180,6 +180,12 @@ a:hover {
     color: #1a1a1a;
 }
 
+.social-links img {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+}
+
 /* Contact page */
 .contact-item {
     margin-bottom: 12px;
