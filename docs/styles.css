@@ -149,6 +149,16 @@ a:hover {
     font-size: 0.85rem;
 }
 
+.pub-link {
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: #2563eb;
+}
+
+.pub-link:hover {
+    color: #1d4ed8;
+}
+
 /* Projects */
 .project {
     margin-bottom: 20px;
