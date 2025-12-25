@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conor Hassan</title>
+    <meta name="description" content="Statistics and Machine Learning Researcher">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            line-height: 1.7;
+            color: #1a1a1a;
+            background: url('nz-background.png') center/cover no-repeat fixed;
+            min-height: 100vh;
+            padding: 48px 24px;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            padding: 64px 48px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        header {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: flex-start;
+            gap: 32px;
+            margin-bottom: 48px;
+        }
+
+        .profile-photo {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        .header-text h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .header-text .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .social-links a:hover {
+            color: #1a1a1a;
+        }
+
+        section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #999;
+            margin-bottom: 16px;
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        a {
+            color: #1a1a1a;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        a:hover {
+            color: #666;
+        }
+
+        .publication {
+            margin-bottom: 18px;
+        }
+
+        .publication p {
+            margin-bottom: 0;
+        }
+
+        .publication-title {
+            font-style: italic;
+        }
+
+        .publication-venue {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        .contact-section p {
+            margin-bottom: 8px;
+        }
+
+        .resume-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .resume-link:hover {
+            background: #333;
+            color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 24px 16px;
+            }
+
+            .container {
+                padding: 40px 24px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+
+            .header-text h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="website_mug.png" alt="Conor Hassan" class="profile-photo">
+            <div class="header-text">
+                <h1>Conor Hassan</h1>
+                <p class="subtitle">Statistics and Machine Learning Researcher</p>
+                <div class="social-links">
+                    <a href="https://github.com/conorhassan">GitHub</a>
+                    <a href="https://www.linkedin.com/in/conorhassan/">LinkedIn</a>
+                    <a href="https://twitter.com/HassanConor">X</a>
+                    <a href="https://scholar.google.com.au/citations?user=l-eA0gsAAAAJ&hl=en">Scholar</a>
+                </div>
+            </div>
+        </header>
+
+        <section>
+            <h2>About</h2>
+            <p>
+                I am a PhD student at the <a href="https://research.qut.edu.au/qutcds/">QUT Centre for Data Science</a>
+                in Brisbane, Australia, working with Distinguished Professor <a href="https://research.qut.edu.au/qutcds/staff/kerrie-mengersen/">Kerrie Mengersen</a>
+                on methods for <a href="https://arxiv.org/abs/2302.03314">Bayesian federated learning</a> and
+                <a href="https://arxiv.org/abs/2307.15424">differentially private generative models</a>.
+                My thesis is currently under internal review.
+            </p>
+            <p>
+                From May to November 2024, I relocated to Melbourne to complete an internship with the
+                machine learning research team at Amazon.
+            </p>
+            <p>
+                My research interests include variational inference, generative models, federated and distributed
+                algorithms, latent-variable models, and Bayesian deep learning.
+            </p>
+            <p>
+                Previously, I worked as a research data scientist at <a href="https://www.wearoptimo.com/">WearOptimo</a>,
+                a biotechnology startup developing microwearable devices, and completed internships in
+                <a href="https://www.imc.com/">quantitative trading</a>, <a href="https://ey.com">consulting</a>,
+                and at a <a href="https://www.agresearch.co.nz/">national scientific institute</a>.
+                I have also worked as a research assistant and tutored seven courses in mathematics and statistics.
+            </p>
+            <p>
+                I am well-versed in using automatic differentiation libraries like JAX and PyTorch,
+                as well as probabilistic programming libraries such as NumPyro, PyMC, Pyro, and Stan.
+            </p>
+        </section>
+
+        <section>
+            <h2>Publications</h2>
+
+            <div class="publication">
+                <p><strong>Conor Hassan</strong>, Robert Salomone, and Kerrie Mengersen.
+                <span class="publication-title">"Federated Variational Inference Methods for Structured Latent Variable Models."</span>
+                <span class="publication-venue">arXiv preprint arXiv:2302.03314 (2023). Under review.</span></p>
+            </div>
+
+            <div class="publication">
+                <p><strong>Conor Hassan</strong>, Robert Salomone, and Kerrie Mengersen.
+                <span class="publication-title">"Deep Generative Models, Synthetic Tabular Data, and Differential Privacy: An Overview and Synthesis."</span>
+                <span class="publication-venue">arXiv preprint arXiv:2307.15424 (2023).</span></p>
+            </div>
+
+            <div class="publication">
+                <p><strong>Conor Hassan</strong>, et al.
+                <span class="publication-title">"Deep Generative Priors for Dependent Data Federated Learning."</span>
+                <span class="publication-venue">In preparation.</span></p>
+            </div>
+
+            <div class="publication">
+                <p><strong>Conor Hassan</strong>, et al.
+                <span class="publication-title">"Bayesian Vertical Federated Learning via Data Augmentation."</span>
+                <span class="publication-venue">In preparation.</span></p>
+            </div>
+
+            <div class="publication">
+                <p>Joshua J. Bon, et al.
+                <span class="publication-title">"Being Bayesian in the 2020s: opportunities and challenges in the practice of modern applied Bayesian statistics."</span>
+                <span class="publication-venue">Philosophical Transactions of the Royal Society A (2023).</span></p>
+            </div>
+        </section>
+
+        <section>
+            <h2>Resume</h2>
+            <a href="ConorHassanWebsiteCV.pdf" class="resume-link">Download CV (PDF)</a>
+        </section>
+
+        <section class="contact-section">
+            <h2>Contact</h2>
+            <p><a href="mailto:conorhassan.ai@gmail.com">conorhassan.ai@gmail.com</a></p>
+        </section>
+    </div>
+</body>
+</html>
