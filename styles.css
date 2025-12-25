@@ -8,7 +8,7 @@ body {
     font-family: 'IBM Plex Mono', monospace;
     line-height: 1.7;
     color: #1a1a1a;
-    background: url('nz-background.png') center/cover no-repeat fixed;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('nz-background.png') center/cover no-repeat fixed;
     min-height: 100vh;
     padding: 48px 24px;
 }
