@@ -77,6 +77,12 @@ header {
 .header-text .subtitle {
     color: #666;
     font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.header-text .affiliation {
+    color: #666;
+    font-size: 0.85rem;
     margin-bottom: 0;
 }
 
@@ -104,14 +110,25 @@ p {
     font-size: 0.9rem;
 }
 
+ul {
+    margin-bottom: 14px;
+    margin-left: 20px;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+li {
+    margin-bottom: 8px;
+}
+
 a {
-    color: #1a1a1a;
+    color: #2563eb;
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
 a:hover {
-    color: #666;
+    color: #1d4ed8;
 }
 
 /* Publications */
