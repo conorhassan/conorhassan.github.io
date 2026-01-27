@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Efficient AR Inference</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/white.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --background: #f8f6f1;
+            --background-alt: #f0ede5;
+            --accent: #5d7a91;
+            --accent-light: #7a9bb5;
+            --text-primary: #3d4a54;
+            --text-secondary: #6b7a86;
+        }
+
+        .reveal { font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
+        .reveal h1, .reveal h2, .reveal h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: none;
+            color: var(--text-primary);
+            margin-bottom: 0.5em;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .reveal h2 { font-size: 1.6em; }
+        .reveal p { color: var(--text-secondary); margin: 0.4em 0; font-size: 0.85em; line-height: 1.4; }
+        .reveal section {
+            background: var(--background);
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 40px 60px;
+        }
+
+        .accent { color: var(--accent); font-weight: 600; }
+
+        .box {
+            background: var(--background-alt);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .two-col {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .two-col > div { flex: 1; }
+        .two-col h3 { font-size: 1em; color: var(--accent); margin-bottom: 0.3em; }
+
+        .principle {
+            background: var(--background-alt);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .principle strong {
+            color: var(--accent);
+            font-size: 0.9em;
+            min-width: 30px;
+        }
+        .principle span { font-size: 0.8em; color: var(--text-secondary); }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .result-card {
+            background: var(--background-alt);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .result-card .value { font-size: 1.4em; color: var(--accent); font-weight: 700; }
+        .result-card .label { font-size: 0.75em; color: var(--text-secondary); }
+
+        .subtitle { font-size: 0.65em !important; color: var(--text-secondary) !important; margin-top: 5px !important; }
+        .authors { font-size: 0.55em !important; color: var(--text-secondary) !important; line-height: 1.3 !important; }
+
+        .footnote {
+            position: absolute;
+            bottom: 20px;
+            left: 60px;
+            right: 60px;
+            font-size: 0.5em !important;
+            color: #999 !important;
+        }
+
+        img { max-width: 100%; border-radius: 8px; }
+
+        .slide-number {
+            position: absolute;
+            bottom: 20px;
+            right: 60px;
+            font-size: 0.65em;
+            color: var(--text-secondary);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+    <p style="margin-top: 40px; margin-bottom: 10px;"><span class="accent" style="font-weight: 600; font-size: 0.9em; background: var(--background-alt); padding: 6px 14px; border-radius: 4px;">ICLR 2026</span></p>
+    <h2 style="margin-top: 15px;">Efficient Autoregressive Inference for<br>Transformer Probabilistic Models</h2>
+    <img src="./mugs/coauthors.png" style="max-height: 280px; margin-top: 20px; border-radius: 12px;">
+</section>
+
+<section>
+    <h2>Meta-Learning</h2>
+    <p style="text-align: center; margin-bottom: 15px;">Let \(\mathcal{D} = \{(x_n, y_n)\}_{n=1}^N\) be a dataset of input-output pairs.</p>
+    <div class="two-col">
+        <div class="box fragment" style="border-left: 4px solid var(--text-secondary);">
+            <h3 style="margin-top: 0;">Standard Prediction</h3>
+            <p>Train on \(\mathcal{D}\) to learn fixed parameters \(\theta\).</p>
+            <p style="font-size: 1.1em; color: var(--text-primary); margin-top: 15px; text-align: center;">\[p_\theta(y^\star \mid x^\star)\]</p>
+            <p style="font-size: 0.75em; margin-top: 10px;">New dataset = retrain from scratch.</p>
+        </div>
+        <div class="box fragment">
+            <h3 style="margin-top: 0;">Probabilistic Meta-Learning</h3>
+            <p>Train on a <span class="accent">distribution of datasets</span> \(p(\mathcal{D})\). Condition on \(\mathcal{D}\) at test time.</p>
+            <p style="font-size: 1.1em; color: var(--text-primary); margin-top: 15px; text-align: center;">\[p_\theta(y^\star \mid x^\star; \mathcal{D})\]</p>
+            <p style="font-size: 0.75em; margin-top: 10px;">Adapts predictions to different datasets without retraining.</p>
+        </div>
+    </div>
+    <span class="slide-number">1/14</span>
+</section>
+
+<section>
+    <h2>Transformer Probabilistic Models</h2>
+    <p><span class="accent">Transformer Neural Processes</span> (TNPs) and <span class="accent">Prior-Fitted Networks</span> (PFNs) share the same parameterization:</p>
+    <div class="box fragment">
+        \[p_\theta(y^\star \mid x^\star; \mathcal{D}) = \prod_m p_\theta\bigl(y^\star_m \mid \text{CrossAttn}(x^\star_m, \text{SelfAttn}(\mathcal{D}))\bigr)\]
+    </div>
+    <div class="two-col fragment" style="margin-top: 20px;">
+        <div class="box" style="text-align: center;">
+            <strong class="accent">Encode Context</strong><br>
+            <span style="font-size: 0.8em;">Bidirectional self-attention over \(\mathcal{D}\)</span>
+        </div>
+        <div class="box" style="text-align: center;">
+            <strong class="accent">Predict Targets</strong><br>
+            <span style="font-size: 0.8em;">Cross-attention from \(x^\star\) to \(\mathcal{D}\)</span>
+        </div>
+    </div>
+    <p style="position: absolute; bottom: 25px; left: 60px; right: 60px; font-size: 0.5em; color: #999; text-align: center;">Garnelo+ 2018, Nguyen & Grover 2022, Müller+ 2022, Hollmann+ 2023, Hollmann+ 2025, Qu+ 2025</p>
+    <span class="slide-number">2/14</span>
+</section>
+
+<section>
+    <h2>Attention Basics</h2>
+    <p>Attention lets queries (targets) retrieve information from keys and values (context).</p>
+    <div class="two-col" style="margin-top: 15px;">
+        <div class="box fragment" style="border-left: 4px solid var(--text-secondary);">
+            <h3 style="margin-top: 0;">Self-Attention</h3>
+            <p>All \(N\) tokens attend to each other. <span class="accent">\(\mathcal{O}(N^2)\)</span></p>
+        </div>
+        <div class="box fragment">
+            <h3 style="margin-top: 0;">Cross-Attention</h3>
+            <p>One target queries \(N\) context tokens. <span class="accent">\(\mathcal{O}(N)\)</span></p>
+        </div>
+    </div>
+    <p class="fragment" style="margin-top: 20px; text-align: center;">Cross-attention is <span class="accent">\(N\times\)</span> more efficient for single-target prediction.</p>
+    <span class="slide-number">3/14</span>
+</section>
+
+<section>
+    <h2>KV Caching for LLMs</h2>
+    <div style="text-align: left; margin-top: 20px;">
+        <p class="fragment"><strong class="accent">1.</strong> Encode prompt via self-attention → cache \(K, V\)</p>
+        <p class="fragment"><strong class="accent">2.</strong> New token cross-attends to cached \(K, V\)</p>
+        <p class="fragment"><strong class="accent">3.</strong> Append new token's \(K, V\) to cache</p>
+        <p class="fragment"><strong class="accent">4.</strong> Repeat. Cost per token: <span class="accent">\(\mathcal{O}(N)\)</span> not \(\mathcal{O}(N^2)\)</p>
+    </div>
+    <div class="box fragment" style="margin-top: 25px;">
+        <strong class="accent">Key requirement:</strong> Tokens form a <span class="accent">causal</span> sequence — each token sees only previous tokens. Our parameterization doesn't have this structure.
+    </div>
+    <span class="slide-number">4/14</span>
+</section>
+
+<section>
+    <h2>Current Parameterization</h2>
+    <p>Supports efficient <span class="accent">product over targets</span>:</p>
+    <div class="box" style="font-size: 0.85em;">
+        \[p_\theta(y^\star_{1:M} \mid x^\star_{1:M}; \mathcal{D}) = \prod_{m} p_\theta\bigl(y^\star_m \mid \text{CrossAttn}(x^\star_m, \text{SelfAttn}(\mathcal{D}))\bigr)\]
+    </div>
+    <p style="margin-top: 25px;">Targets are predicted <span class="accent">independently</span> — no dependencies between \(y^\star_m\).</p>
+    <span class="slide-number">5/14</span>
+</section>
+
+<section>
+    <h2>Bottleneck</h2>
+    <p>To model <span class="accent">joint distributions</span>, we need autoregressive factorization:</p>
+    <div class="box fragment">
+        \[p_\theta(y^\star_{1:K} \mid x^\star_{1:K}; \mathcal{D}) = \prod_{k=1}^{K} p_\theta\left(y^\star_k \mid x^\star_k;\, \mathcal{D} \cup \{(x^\star_j, y^\star_j)\}_{j=1}^{k-1}\right)\]
+    </div>
+    <p class="fragment" style="margin-top: 20px;">Each step requires re-encoding \(\mathcal{D} \cup \{\text{previous predictions}\}\) via bidirectional self-attention.</p>
+    <p class="fragment" style="margin-top: 15px;">Cost to generate sample from \(K\)-dimensional joint: <span class="accent">\(\mathcal{O}(K(N+K)^2)\)</span></p>
+    <span class="slide-number">6/14</span>
+</section>
+
+<section>
+    <h2>Causal Autoregressive Buffer</h2>
+    <p>Context \(\mathcal{D}\) is <span class="accent">immutable</span>. Buffer \(\mathcal{B}\) grows <span class="accent">causally</span> with predictions.</p>
+    <div class="box fragment">
+        \[p_\theta(y^\star_{1:K} \mid x^\star_{1:K}; \mathcal{D}) = \prod_{k=1}^{K} p_\theta\left(y^\star_k \mid x^\star_k;\, [\mathcal{D}, \mathbf{b}_{1:k-1}]\right)\]
+    </div>
+    <div class="two-col fragment" style="margin-top: 15px;">
+        <div class="box" style="border-left: 4px solid var(--text-secondary); text-align: center;">
+            <strong>Context</strong><br>
+            <span style="font-size: 0.8em;">Encoded once, cached, read-only</span>
+        </div>
+        <div class="box" style="text-align: center;">
+            <strong class="accent">Buffer</strong><br>
+            <span style="font-size: 0.8em;">Causal, grows with each prediction</span>
+        </div>
+    </div>
+    <p class="fragment" style="margin-top: 10px; text-align: center;">\(\mathcal{O}(K(N+K)^2) \to\) <span class="accent">\(\mathcal{O}(N^2 + NK + K^2)\)</span></p>
+    <span class="slide-number">7/14</span>
+</section>
+
+<section>
+    <h2>Training Strategy</h2>
+    <div class="two-col">
+        <div class="box" style="border-left: 4px solid var(--text-secondary);">
+            <h3 style="margin-top: 0;">Standard</h3>
+            <img src="./mugs/row3_lhs.png" style="max-height: 24vh; display: block; margin: 10px auto 0;">
+        </div>
+        <div class="box">
+            <h3 style="margin-top: 0;">With Buffer</h3>
+            <img src="./mugs/row3_rhs.png" style="max-height: 24vh; display: block; margin: 10px auto 0;">
+        </div>
+    </div>
+    <p style="margin-top: 10px;"><span class="accent">Curriculum:</span> 50% targets see only context, 50% see context + random buffer prefix. When buffer is empty, model recovers standard parameterization.</p>
+    <span class="slide-number">8/14</span>
+</section>
+
+<section>
+    <h2>Autoregressive Sampling</h2>
+    <div class="two-col">
+        <div class="box" style="border-left: 4px solid var(--text-secondary);">
+            <h3 style="margin-top: 0;">Standard AR</h3>
+            <img src="./mugs/row1_lhs.png" style="max-height: 28vh; display: block; margin: 10px auto 0;">
+        </div>
+        <div class="box">
+            <h3 style="margin-top: 0;">With Buffer</h3>
+            <img src="./mugs/row1_rhs.png" style="max-height: 28vh; display: block; margin: 10px auto 0;">
+        </div>
+    </div>
+    <p style="margin-top: 15px; text-align: center;"><span class="accent">3-20x faster</span> sampling</p>
+    <span class="slide-number">9/14</span>
+</section>
+
+<section>
+    <h2>Parallel Density Evaluation</h2>
+    <div class="two-col">
+        <div class="box" style="border-left: 4px solid var(--text-secondary);">
+            <h3 style="margin-top: 0;">Standard AR</h3>
+            <img src="./mugs/row2_lhs.png" style="max-height: 28vh; display: block; margin: 10px auto 0;">
+        </div>
+        <div class="box">
+            <h3 style="margin-top: 0;">With Buffer</h3>
+            <img src="./mugs/row2_rhs.png" style="max-height: 28vh; display: block; margin: 10px auto 0;">
+        </div>
+    </div>
+    <p style="margin-top: 15px; text-align: center;"><span class="accent">K× faster</span> density evaluation</p>
+    <span class="slide-number">10/14</span>
+</section>
+
+<section>
+    <h2>Evaluation</h2>
+    <div class="results-grid">
+        <div class="result-card"><div class="value" style="font-size: 1em;">Synthetic</div><div class="label">GP & Sawtooth regression<br>Joint sampling & density evaluation</div></div>
+        <div class="result-card"><div class="value" style="font-size: 1em;">EEG</div><div class="label">Real-world time series<br>Interpolation & forecasting</div></div>
+        <div class="result-card"><div class="value" style="font-size: 1em;">Model Selection</div><div class="label">Multisensory causal inference<br>LML estimation vs ground-truth</div></div>
+        <div class="result-card"><div class="value" style="font-size: 1em;">Tabular</div><div class="label">TabICL on UCI datasets<br>Multi-row joint prediction</div></div>
+    </div>
+    <p style="margin-top: 20px; text-align: center;">Tested across <span class="accent">diverse tasks</span> requiring joint prediction.</p>
+    <span class="slide-number">11/14</span>
+</section>
+
+<section>
+    <h2>Results</h2>
+    <img src="./figures/five_panel_dark.png" style="max-height: 60vh; display: block; margin: 0 auto;">
+    <span class="slide-number">12/14</span>
+</section>
+
+<section>
+    <h2>Summary</h2>
+    <div class="box fragment"><strong class="accent">Efficient method</strong> for joint prediction in TNPs/PFNs — cache context, buffer predictions causally</div>
+    <div class="box fragment"><strong class="accent">Matches AR accuracy</strong> with up to 20× faster sampling and 6-7× less memory</div>
+    <div class="box fragment"><strong class="accent">Plug-and-play</strong> via attention masks — works with TNP, PFN, TabICL, Perceiver</div>
+    <span class="slide-number">13/14</span>
+</section>
+
+<section>
+    <h2>Future Work</h2>
+    <div class="box fragment"><strong class="accent">Speculative Decoding</strong><br><span style="font-size:0.8em;">Draft-verify strategies for more efficient inference</span></div>
+    <div class="box fragment"><strong class="accent">Test-Time Adaptation</strong><br><span style="font-size:0.8em;">Build target-dependent KV caches at test time</span></div>
+    <div class="box fragment"><strong class="accent">Applications & Scale</strong><br><span style="font-size:0.8em;">Existing AR deployments of NPs/PFNs, tabular foundation models at scale</span></div>
+    <span class="slide-number">14/14</span>
+</section>
+
+<section>
+    <h2 style="margin-top: 120px;">Thank You</h2>
+    <div class="box" style="text-align: center; margin-top: 40px;">
+        <a href="https://arxiv.org/abs/2510.09477" style="color: var(--accent); font-size: 1.3em;">arxiv.org/abs/2510.09477</a>
+    </div>
+</section>
+
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script>
+Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0,
+    minScale: 0.5,
+    maxScale: 2.0,
+    center: false,
+    hash: true,
+    transition: 'slide',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade'
+});
+</script>
+</body>
+</html>
