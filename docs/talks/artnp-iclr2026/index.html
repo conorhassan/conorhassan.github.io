@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Efficient AR Inference</title>
+    <title>Efficient Inference for Amortized Probabilistic Transformers</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/white.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +36,10 @@
             width: 100%;
             box-sizing: border-box;
             padding: 40px 60px;
+            overflow: hidden;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .accent { color: var(--accent); font-weight: 600; }
@@ -110,17 +114,65 @@
             color: var(--text-secondary);
             font-family: 'Space Grotesk', sans-serif;
         }
+
+        /* Compact typography + vertical centering for TAMO slides */
+        .tamo {
+            font-size: 0.82em;
+        }
+        .tamo h2 { font-size: 1.35em; margin-bottom: 0.3em; }
+        .tamo p { font-size: 0.78em; margin: 0.25em 0; }
+        .tamo .box { padding: 8px 14px; margin: 6px 0; font-size: 0.85em; }
+        .tamo .two-col { gap: 20px; margin-top: 10px; }
+        .tamo .grid-2x2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .dark-slide {
+            background: #2c3e50 !important;
+        }
+        .dark-slide h2 { color: #fff; }
+        .dark-slide p { color: #ccc; }
+        .dark-slide .slide-number { color: #999; }
+
+        .numbered-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .numbered-list li {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            margin: 8px 0;
+            padding-left: 5px;
+        }
     </style>
 </head>
 <body>
 <div class="reveal">
 <div class="slides">
 
+<!-- ============================================ -->
+<!-- COMBINED TITLE SLIDE                         -->
+<!-- ============================================ -->
+<section>
+    <h2>Efficient Inference for<br>Amortized Probabilistic Transformers</h2>
+</section>
+
+<!-- ============================================ -->
+<!-- PAPER 1 DIVIDER                              -->
+<!-- ============================================ -->
 <section>
     <p style="margin-top: 40px; margin-bottom: 10px;"><span class="accent" style="font-weight: 600; font-size: 0.9em; background: var(--background-alt); padding: 6px 14px; border-radius: 4px;">ICLR 2026</span></p>
     <h2 style="margin-top: 15px;">Efficient Autoregressive Inference for<br>Transformer Probabilistic Models</h2>
-    <img src="./mugs/coauthors.png" style="max-height: 280px; margin-top: 20px; border-radius: 12px;">
+    <img src="./mugs/coauthors.png" style="max-height: 250px; margin-top: 20px; border-radius: 12px; object-fit: contain;">
 </section>
+
+<!-- ============================================ -->
+<!-- PAPER 1 SLIDES (ARTNP)                       -->
+<!-- ============================================ -->
 
 <section>
     <h2>Meta-Learning</h2>
@@ -158,7 +210,7 @@
             <span style="font-size: 0.8em;">Cross-attention from \(x^\star\) to \(\mathcal{D}\)</span>
         </div>
     </div>
-    <p style="position: absolute; bottom: 25px; left: 60px; right: 60px; font-size: 0.5em; color: #999; text-align: center;">Garnelo+ 2018, Nguyen & Grover 2022, Müller+ 2022, Hollmann+ 2023, Hollmann+ 2025, Qu+ 2025</p>
+    <p style="position: absolute; bottom: 10px; left: 60px; right: 60px; font-size: 0.5em; color: #999; text-align: center;">Garnelo+ 2018, Nguyen & Grover 2022, Müller+ 2022, Hollmann+ 2023, Hollmann+ 2025, Qu+ 2025</p>
     <span class="slide-number">2/14</span>
 </section>
 
@@ -321,6 +373,221 @@
         <a href="https://arxiv.org/abs/2510.09477" style="color: var(--accent); font-size: 1.3em;">arxiv.org/abs/2510.09477</a>
     </div>
     <p style="margin-top: 25px; font-size: 0.75em;">Recent related work: <a href="https://arxiv.org/abs/2602.18955" style="color: var(--accent);">Incremental TNP</a> (Mortimer et al.) applies causal masking to the context encoder, enabling cheap incremental updates for streaming settings.</p>
+</section>
+
+<!-- ============================================ -->
+<!-- PAPER 2 DIVIDER                              -->
+<!-- ============================================ -->
+<section class="tamo">
+    <p style="margin-bottom: 10px;"><span class="accent" style="font-weight: 600; font-size: 0.9em; background: var(--background-alt); padding: 6px 14px; border-radius: 4px;">ICLR 2026</span></p>
+    <h2 style="margin-top: 15px;">In-Context Multi-Objective Optimization</h2>
+    <p style="margin-top: 20px;">Xinyu Zhang, Conor Hassan, Julien Martinelli, Daolang Huang, Samuel Kaski</p>
+</section>
+
+<!-- ============================================ -->
+<!-- PAPER 2 SLIDES (TAMO)                        -->
+<!-- ============================================ -->
+
+<!-- TAMO Slide 1: Black-box Optimization -->
+<section class="tamo">
+    <h2>Black-Box Optimization</h2>
+    <p>Let \(\mathcal{X}\) be a design space and \(f\) an objective function. We seek \(\mathbf{x} = \arg\max_{\mathbf{x} \in \mathcal{X}} f(\mathbf{x})\)</p>
+    <div class="two-col">
+        <div>
+            <div class="box" style="border-left: 4px solid var(--text-secondary);">
+                <strong>Challenge</strong>
+                <p>No information about \(f\) — gradients, convexity, invariances...</p>
+                <p>Can only evaluate \(y_i = f(\mathbf{x}_i) + \varepsilon\)</p>
+                <p>Collect observations \(\mathcal{D}_t = \{(\mathbf{x}_i, y_i)\}_{i=1}^t\)</p>
+            </div>
+        </div>
+        <div>
+            <div class="box fragment">
+                <strong class="accent">Bayesian Optimization</strong>
+                <p>Surrogate: \(f(\mathbf{x}) \sim \mathcal{GP}(\mu_{\theta_1}(\mathbf{x}), k_{\theta_2}(\mathbf{x}, \mathbf{x}'))\)</p>
+                <p>Acquisition: \(\mathbf{x}_{t+1} = \arg\max_{\mathbf{x}} \alpha_{\theta_3}(\mathbf{x} \mid \mathcal{D}_t)\)</p>
+                <p>Evaluate, append, update surrogate, repeat.</p>
+            </div>
+        </div>
+    </div>
+    <span class="slide-number">1/16</span>
+</section>
+
+<!-- TAMO Slide 2: Multi-objective Optimization -->
+<section class="tamo">
+    <h2>Multi-Objective Optimization</h2>
+    <p>We now observe a <span class="accent">vector</span> of objectives \(\mathbf{f}(\mathbf{x}) = [f_1(\mathbf{x}), \dots, f_M(\mathbf{x})] \in \mathbb{R}^M\)</p>
+    <div class="two-col">
+        <div style="text-align: center; display: flex; align-items: center; justify-content: center;">
+            <img src="./tamo-figures/moo_illustration.png" style="max-height: 42vh;">
+        </div>
+        <div>
+            <div class="box fragment" style="border-left: 4px solid var(--text-secondary);">
+                <strong>Pareto optimality:</strong> \(\mathbf{x}\) dominates \(\mathbf{x}'\) if
+                <p>\(\forall i:\; f_i(\mathbf{x}) \ge f_i(\mathbf{x}')\) and \(\exists i:\; f_i(\mathbf{x}) > f_i(\mathbf{x}')\)</p>
+            </div>
+            <div class="box fragment">
+                <strong class="accent">Hypervolume indicator:</strong>
+                <p style="margin-top: 5px;">\[\mathrm{HV}(\mathcal{P};\, \mathbf{r}) = \lambda_m\!\left(\bigcup_{\mathbf{p} \in \mathcal{P}} \prod_{i=1}^m [r_i, p_i]\right)\]</p>
+                <p>Volume dominated by \(\mathcal{P}\), bounded by \(\mathbf{r}\).</p>
+            </div>
+        </div>
+    </div>
+    <span class="slide-number">2/16</span>
+</section>
+
+<!-- TAMO Slide 3: Caveats -->
+<section class="tamo">
+    <h2>Caveats</h2>
+    <div class="box fragment" style="border-left: 4px solid var(--text-secondary);">
+        <strong class="accent">1.</strong> Surrogate/acquisition selection dependent on expert choice; won't transfer.
+        → <strong>"Learn" the language of optimization</strong>
+    </div>
+    <div class="box fragment" style="border-left: 4px solid var(--text-secondary);">
+        <strong class="accent">2.</strong> Slow in high-throughput settings due to GP cubic complexity.
+        → <strong>Offline pre-training, reduce inference to a feedforward pass</strong>
+    </div>
+    <div class="box fragment" style="border-left: 4px solid var(--text-secondary);">
+        <strong class="accent">3.</strong> Most methods are myopic, focused on 1-step optimality.
+        → <strong>Train over long optimization horizons using RL</strong>
+    </div>
+    <div class="box fragment" style="border-left: 4px solid var(--text-secondary);">
+        <strong class="accent">4.</strong> Learning from previous campaigns not straightforward — different objectives or dimensions.
+        → <strong>Dimension-agnostic task embeddings</strong>
+    </div>
+    <p class="fragment" style="text-align: center; margin-top: 10px; color: var(--text-primary);"><strong>Solution: Task-Agnostic Amortization (TAMO)</strong></p>
+    <span class="slide-number">3/16</span>
+</section>
+
+<!-- TAMO Slide 4: Overview -->
+<section class="tamo">
+    <h2>Overview</h2>
+    <img src="./tamo-figures/main_gist.png" style="max-height: 55vh; display: block; margin: 15px auto 0;">
+    <span class="slide-number">4/16</span>
+</section>
+
+<!-- TAMO Slide 5: Architecture at a Glance -->
+<section class="tamo">
+    <h2>TAMO: Architecture at a Glance</h2>
+    <p><span class="accent">Optimization ⟺ Predicting the optimum.</span> Same core components for both prediction and optimization batches.</p>
+    <div class="grid-2x2">
+        <div class="box fragment"><strong class="accent">1.</strong> <strong>Dimension-agnostic embedder:</strong> scalar→vector maps, tokens independent of input/output dim.</div>
+        <div class="box fragment"><strong class="accent">2.</strong> <strong>Transformer encoder:</strong> aggregates variable-size histories/contexts into compact summary.</div>
+        <div class="box fragment"><strong class="accent">3.</strong> <strong>Task conditioning:</strong> learned tokens injected late to specialize computation.</div>
+        <div class="box fragment"><strong class="accent">4.</strong> <strong>Two heads:</strong> prediction (density) and policy (acquisition over query set).</div>
+    </div>
+    <span class="slide-number">5/16</span>
+</section>
+
+<!-- TAMO Slide 6: Pretraining - Task Distribution -->
+<section class="tamo dark-slide">
+    <h2>Pretraining — Task Distribution</h2>
+    <img src="./tamo-figures/pretraining_001.png" style="max-height: 55vh; display: block; margin: 10px auto 0; border-radius: 4px;">
+    <span class="slide-number">6/16</span>
+</section>
+
+<!-- TAMO Slide 7: Pretraining - Two Distinct Mini-batches -->
+<section class="tamo dark-slide">
+    <h2>Pretraining — Two Distinct Mini-Batches</h2>
+    <img src="./tamo-figures/main_gist_tamo_001.png" style="max-height: 55vh; display: block; margin: 10px auto 0; border-radius: 4px;">
+    <span class="slide-number">7/16</span>
+</section>
+
+<!-- TAMO Slide 8: Pretraining - Mini-batches Detail -->
+<section class="tamo dark-slide">
+    <h2>Pretraining — Mini-Batches Detail</h2>
+    <img src="./tamo-figures/pretraining_003.png" style="max-height: 55vh; display: block; margin: 10px auto 0; border-radius: 4px;">
+    <span class="slide-number">8/16</span>
+</section>
+
+<!-- TAMO Slide 9: Pretraining - Dimension Agnostic Embedder -->
+<section class="tamo dark-slide">
+    <h2>Pretraining — Dimension-Agnostic Embedder</h2>
+    <img src="./tamo-figures/pretraining_004.png" style="max-height: 55vh; display: block; margin: 10px auto 0; border-radius: 4px;">
+    <span class="slide-number">9/16</span>
+</section>
+
+<!-- TAMO Slide 10: Pretraining - Transformer Encoder-Decoder -->
+<section class="tamo dark-slide">
+    <h2>Pretraining — Transformer Encoder-Decoder</h2>
+    <img src="./tamo-figures/pretraining_005.png" style="max-height: 55vh; display: block; margin: 10px auto 0; border-radius: 4px;">
+    <span class="slide-number">10/16</span>
+</section>
+
+<!-- TAMO Slide 11: Inference -->
+<section class="tamo">
+    <h2>Inference</h2>
+    <img src="./tamo-figures/testalgo.png" style="max-height: 55vh; display: block; margin: 10px auto 0;">
+    <span class="slide-number">11/16</span>
+</section>
+
+<!-- TAMO Slide 12: Results - Synthetic and Real-world -->
+<section class="tamo">
+    <h2>Results — Synthetic and Real-World Benchmarks</h2>
+    <img src="./tamo-figures/figure_3.png" style="max-height: 50vh; display: block; margin: 10px auto 0;">
+    <p style="text-align: center; margin-top: 10px;">Achieves competitive regret while cutting proposal time by <span class="accent">50×–1000×</span></p>
+    <span class="slide-number">12/16</span>
+</section>
+
+<!-- TAMO Slide 13: Results - HPO-3DGS -->
+<section class="tamo">
+    <h2>Results — HPO-3DGS Hyperparameter Optimization</h2>
+    <img src="./tamo-figures/figure_s10.png" style="max-height: 55vh; display: block; margin: 10px auto 0;">
+    <span class="slide-number">13/16</span>
+</section>
+
+<!-- TAMO Slide 14: Results - Single-objective BO -->
+<section class="tamo">
+    <h2>Results — Single-Objective BO</h2>
+    <img src="./tamo-figures/figure_s2.png" style="max-height: 55vh; display: block; margin: 10px auto 0;">
+    <span class="slide-number">14/16</span>
+</section>
+
+<!-- TAMO Slide 15: Results - Out of Distribution -->
+<section class="tamo">
+    <h2>Results — Out of Distribution</h2>
+    <div class="two-col">
+        <div style="text-align: center;">
+            <img src="./tamo-figures/figure_4a.png" style="max-height: 50vh;">
+        </div>
+        <div style="text-align: center;">
+            <img src="./tamo-figures/figure_4b.png" style="max-height: 50vh;">
+        </div>
+    </div>
+    <span class="slide-number">15/16</span>
+</section>
+
+<!-- TAMO Slide 16: Conclusion -->
+<section class="tamo">
+    <h2>Conclusion & Perspectives</h2>
+    <div class="box">
+        <strong class="accent">Universal model for black-box optimization</strong>
+        <p>Extensible to constrained, multi-source, preferential, cost-aware variants. Mostly pre-training modification, not a paradigm shift.</p>
+    </div>
+    <div class="box fragment">
+        <strong class="accent">Scale-up</strong>
+        <p>High dimension, different BO setups → generalizable positional embeddings, factorized/continuous-space policy, multi-GPU training</p>
+    </div>
+    <div class="box fragment">
+        <strong class="accent">Pre-training dataset design</strong>
+        <p>"Broader prior is better prior" — what does the model learn? → Mechanistic interpretability</p>
+    </div>
+    <span class="slide-number">16/16</span>
+</section>
+
+<!-- ============================================ -->
+<!-- THANKS SLIDE                                 -->
+<!-- ============================================ -->
+<section>
+    <h2>Thanks!</h2>
+    <div class="box" style="text-align: center; margin-top: 20px;">
+        <strong class="accent">Paper 1 — Efficient Autoregressive Inference for Transformer Probabilistic Models</strong>
+        <p><a href="https://arxiv.org/abs/2510.09477" style="color: var(--accent);">arxiv.org/abs/2510.09477</a></p>
+    </div>
+    <div class="box" style="text-align: center; margin-top: 10px;">
+        <strong class="accent">Paper 2 — In-Context Multi-Objective Optimization</strong>
+        <p><a href="https://arxiv.org/abs/2512.11114" style="color: var(--accent);">arxiv.org/abs/2512.11114</a></p>
+    </div>
 </section>
 
 </div>
