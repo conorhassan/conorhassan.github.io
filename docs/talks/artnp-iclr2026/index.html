@@ -196,12 +196,23 @@
 
 <section>
     <h2>Transformer Probabilistic Models</h2>
-    <p><span class="accent">Transformer Neural Processes</span> (TNPs) and <span class="accent">Prior-Fitted Networks</span> (PFNs) share the same parameterization:</p>
+    <p><span class="accent">Transformer Neural Processes</span> (TNPs) and <span class="accent">Prior-Fitted Networks</span> (PFNs) predict targets conditioned on context:</p>
     <div class="box fragment">
-        \[p_\theta(y^\star \mid x^\star; \mathcal{D}) = \prod_m p_\theta\bigl(y^\star_m \mid \text{CrossAttn}(x^\star_m, \text{SelfAttn}(\mathcal{D}))\bigr)\]
+        \[p_\theta(y^\star_{1:M} \mid x^\star_{1:M};\, \mathcal{D}) = \prod_{m} p_\theta\bigl(y^\star_m \mid x^\star_m;\, \mathcal{D}\bigr)\]
+    </div>
+    <p class="fragment" style="margin-top: 20px;">Targets are predicted <span class="accent">independently</span> — no dependencies between \(y^\star_m\).</p>
+    <p style="position: absolute; bottom: 10px; left: 60px; right: 60px; font-size: 0.5em; color: #999; text-align: center;">Garnelo+ 2018, Nguyen & Grover 2022, Müller+ 2022, Hollmann+ 2023, Hollmann+ 2025, Qu+ 2025</p>
+    <span class="slide-number">2/14</span>
+</section>
+
+<section>
+    <h2>Current Parameterization</h2>
+    <p>Under the hood, a transformer encodes context and predicts targets via attention:</p>
+    <div class="box" style="font-size: 0.85em;">
+        \[p_\theta(y^\star_m \mid x^\star_m;\, \mathcal{D}) = p_\theta\bigl(y^\star_m \mid \text{CrossAttn}(x^\star_m, \text{SelfAttn}(\mathcal{D}))\bigr)\]
     </div>
     <div class="two-col fragment" style="margin-top: 20px;">
-        <div class="box" style="text-align: center;">
+        <div class="box" style="border-left: 4px solid var(--text-secondary); text-align: center;">
             <strong class="accent">Encode Context</strong><br>
             <span style="font-size: 0.8em;">Bidirectional self-attention over \(\mathcal{D}\)</span>
         </div>
@@ -210,8 +221,7 @@
             <span style="font-size: 0.8em;">Cross-attention from \(x^\star\) to \(\mathcal{D}\)</span>
         </div>
     </div>
-    <p style="position: absolute; bottom: 10px; left: 60px; right: 60px; font-size: 0.5em; color: #999; text-align: center;">Garnelo+ 2018, Nguyen & Grover 2022, Müller+ 2022, Hollmann+ 2023, Hollmann+ 2025, Qu+ 2025</p>
-    <span class="slide-number">2/14</span>
+    <span class="slide-number">3/14</span>
 </section>
 
 <section>
@@ -228,7 +238,18 @@
         </div>
     </div>
     <p class="fragment" style="margin-top: 20px; text-align: center;">Cross-attention is <span class="accent">\(N\times\)</span> more efficient for single-target prediction.</p>
-    <span class="slide-number">3/14</span>
+    <span class="slide-number">4/14</span>
+</section>
+
+<section>
+    <h2>Bottleneck</h2>
+    <p>To model <span class="accent">joint distributions</span>, we need autoregressive factorization:</p>
+    <div class="box fragment">
+        \[p_\theta(y^\star_{1:K} \mid x^\star_{1:K}; \mathcal{D}) = \prod_{k=1}^{K} p_\theta\left(y^\star_k \mid x^\star_k;\, \mathcal{D} \cup \{(x^\star_j, y^\star_j)\}_{j=1}^{k-1}\right)\]
+    </div>
+    <p class="fragment" style="margin-top: 20px;">Each step requires re-encoding \(\mathcal{D} \cup \{\text{previous predictions}\}\) via bidirectional self-attention.</p>
+    <p class="fragment" style="margin-top: 15px;">Cost to generate sample from \(K\)-dimensional joint: <span class="accent">\(\mathcal{O}(K(N+K)^2)\)</span></p>
+    <span class="slide-number">5/14</span>
 </section>
 
 <section>
@@ -242,27 +263,6 @@
     <div class="box fragment" style="margin-top: 25px;">
         <strong class="accent">Key requirement:</strong> Tokens form a <span class="accent">causal</span> sequence — each token sees only previous tokens. Our parameterization doesn't have this structure.
     </div>
-    <span class="slide-number">4/14</span>
-</section>
-
-<section>
-    <h2>Current Parameterization</h2>
-    <p>Supports efficient <span class="accent">product over targets</span>:</p>
-    <div class="box" style="font-size: 0.85em;">
-        \[p_\theta(y^\star_{1:M} \mid x^\star_{1:M}; \mathcal{D}) = \prod_{m} p_\theta\bigl(y^\star_m \mid \text{CrossAttn}(x^\star_m, \text{SelfAttn}(\mathcal{D}))\bigr)\]
-    </div>
-    <p style="margin-top: 25px;">Targets are predicted <span class="accent">independently</span> — no dependencies between \(y^\star_m\).</p>
-    <span class="slide-number">5/14</span>
-</section>
-
-<section>
-    <h2>Bottleneck</h2>
-    <p>To model <span class="accent">joint distributions</span>, we need autoregressive factorization:</p>
-    <div class="box fragment">
-        \[p_\theta(y^\star_{1:K} \mid x^\star_{1:K}; \mathcal{D}) = \prod_{k=1}^{K} p_\theta\left(y^\star_k \mid x^\star_k;\, \mathcal{D} \cup \{(x^\star_j, y^\star_j)\}_{j=1}^{k-1}\right)\]
-    </div>
-    <p class="fragment" style="margin-top: 20px;">Each step requires re-encoding \(\mathcal{D} \cup \{\text{previous predictions}\}\) via bidirectional self-attention.</p>
-    <p class="fragment" style="margin-top: 15px;">Cost to generate sample from \(K\)-dimensional joint: <span class="accent">\(\mathcal{O}(K(N+K)^2)\)</span></p>
     <span class="slide-number">6/14</span>
 </section>
 
@@ -428,7 +428,7 @@
             </div>
             <div class="box fragment">
                 <strong class="accent">Hypervolume indicator:</strong>
-                <p style="margin-top: 5px;">\[\mathrm{HV}(\mathcal{P};\, \mathbf{r}) = \lambda_m\!\left(\bigcup_{\mathbf{p} \in \mathcal{P}} \prod_{i=1}^m [r_i, p_i]\right)\]</p>
+                <p style="margin-top: 5px;">\[\mathrm{HV}(\mathcal{P};\, \mathbf{r}) = \mathrm{Vol}\!\left(\left\{\mathbf{y} \in \mathbb{R}^m : \exists\, \mathbf{p} \in \mathcal{P},\; r_i \leq y_i \leq p_i \;\;\forall\, i\right\}\right)\]</p>
                 <p>Volume dominated by \(\mathcal{P}\), bounded by \(\mathbf{r}\).</p>
             </div>
         </div>
