@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Efficient Autoregressive Inference for Transformer Probabilistic Models</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            /* Pastel Color Palette */
+            --primary: #a8d5e5;
+            --primary-dark: #8bc4d6;
+            --secondary: #d4a5d9;
+            --accent-green: #b8e0c8;
+            --accent-blue: #a8d5e5;
+            --accent-peach: #f8d5c4;
+            --accent-lavender: #d4c4f8;
+            --accent-mint: #c4f8e0;
+            --text: #4a5568;
+            --text-light: #718096;
+            --bg: #fefefe;
+            --bg-alt: #f7f8fc;
+            --border: #e8ecf4;
+            --gradient-start: #fce4b8;
+            --gradient-mid: #f8d5c4;
+            --gradient-end: #fdecd0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--bg);
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-mid) 50%, var(--gradient-end) 100%);
+            padding: 80px 20px 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .venue-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            color: #5a67d8;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 24px;
+            line-height: 1.2;
+        }
+
+        .authors {
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+        }
+
+        .affiliations {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-bottom: 32px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #5a67d8;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.5);
+            color: #4a5568;
+            border: 2px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.8);
+            border-color: rgba(255,255,255,0.9);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        section:nth-child(even) {
+            background: var(--bg-alt);
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text);
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-lavender), var(--accent-peach));
+            border-radius: 2px;
+        }
+
+        /* Teaser Figure */
+        .teaser {
+            background: white;
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .teaser img {
+            width: 100%;
+            display: block;
+        }
+
+        .teaser-caption {
+            padding: 24px 32px;
+            background: var(--bg-alt);
+            border-top: 1px solid var(--border);
+        }
+
+        .teaser-caption p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .teaser-caption strong {
+            color: var(--text);
+        }
+
+        /* Abstract */
+        .abstract-content {
+            font-size: 1.1rem;
+            color: var(--text);
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            border-left: 5px solid var(--accent-lavender);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        /* Key Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 32px 24px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .result-card:nth-child(1) { background: linear-gradient(135deg, #fff 0%, #e8f4f8 100%); }
+        .result-card:nth-child(2) { background: linear-gradient(135deg, #fff 0%, #f0e8f8 100%); }
+        .result-card:nth-child(3) { background: linear-gradient(135deg, #fff 0%, #f8ece8 100%); }
+        .result-card:nth-child(4) { background: linear-gradient(135deg, #fff 0%, #e8f8f0 100%); }
+
+        .result-number {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #5a67d8, #9f7aea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .result-label {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Method Section */
+        .method-visual {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .method-visual {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .method-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+        }
+
+        .method-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .method-card.standard h3 {
+            color: #68d391;
+        }
+
+        .method-card.ours h3 {
+            color: #63b3ed;
+        }
+
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .method-card.standard .method-icon {
+            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+            color: #276749;
+        }
+
+        .method-card.ours .method-icon {
+            background: linear-gradient(135deg, #bee3f8, #90cdf4);
+            color: #2b6cb0;
+        }
+
+        .complexity {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-alt);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 16px 0;
+            font-size: 0.95rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Figure */
+        .figure-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            margin: 40px 0;
+            border: 1px solid var(--border);
+        }
+
+        .figure-container img, .figure-container object {
+            width: 100%;
+            display: block;
+            background: white;
+        }
+
+        .figure-caption {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #faf5ff 0%, #f0fff4 100%);
+            font-size: 0.9rem;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Contributions */
+        .contributions-list {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .contributions-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .contributions-list li:last-child {
+            border-bottom: none;
+        }
+
+        .contribution-num {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-lavender), var(--accent-peach));
+            color: #5a67d8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .contribution-text {
+            font-size: 1.05rem;
+        }
+
+        /* Citation */
+        .citation-box {
+            background: linear-gradient(135deg, #2d3748, #4a5568);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+            position: relative;
+        }
+
+        .citation-box pre {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.6;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #cbd5e0;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #fef6e4 0%, #fdecd0 50%, #fce4b8 100%);
+            color: var(--text-light);
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        footer a {
+            color: #5a67d8;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Results Table Preview */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+        }
+
+        th {
+            background: linear-gradient(135deg, #f7f8fc 0%, #faf5ff 100%);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #faf5ff;
+        }
+
+        .highlight-row td {
+            background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+        }
+
+        .highlight-row:hover td {
+            background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <div class="venue-badge">
+                <i class="fas fa-file-alt"></i>&nbsp; ICLR 2026
+            </div>
+            <h1>Efficient Autoregressive Inference for Transformer Probabilistic Models</h1>
+            <p class="authors">
+                Conor Hassan<sup>1*</sup>, Nasrulloh Loka<sup>2*</sup>, Cen-You Li<sup>2</sup>, Daolang Huang<sup>1</sup>, Paul E. Chang<sup>2,3</sup>, Yang Yang<sup>2</sup>, Francesco Silvestrin<sup>2</sup>, Samuel Kaski<sup>1,4,5</sup>, Luigi Acerbi<sup>2</sup>
+            </p>
+            <p class="affiliations">
+                <sup>1</sup>ELLIS Institute Finland &nbsp;&nbsp;
+                <sup>2</sup>University of Helsinki &nbsp;&nbsp;
+                <sup>3</sup>DataCrunch &nbsp;&nbsp;
+                <sup>4</sup>University of Manchester &nbsp;&nbsp;
+                <sup>5</sup>Aalto University
+            </p>
+            <p class="affiliations" style="font-style: italic; margin-top: 4px;">
+                *Equal contribution
+            </p>
+            <div class="hero-buttons">
+                <a href="https://arxiv.org/abs/2510.09477" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Paper
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <i class="fab fa-github"></i> Code (Coming Soon)
+                </a>
+                <a href="#citation" class="btn btn-secondary">
+                    <i class="fas fa-quote-left"></i> Cite
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Teaser Figure -->
+    <div class="container">
+        <div class="teaser">
+<img src="figures/gist_figure.png" alt="Method Overview">
+            <div class="teaser-caption">
+                <p><strong>The autoregressive buffer enables fast joint inference by eliminating redundant context re-computation.</strong>
+                <em>Left:</em> Traditional autoregressive approach requires re-encoding the entire context at each step (\(\mathcal{O}(K(N+K)^2)\) complexity).
+                Our buffered approach encodes the context once and caches it, with new predictions entering a causal buffer.
+                <em>Right:</em> Both strategies achieve comparable predictive accuracy, while our method delivers up to <strong>20× faster</strong> sampling.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Results -->
+    <section>
+        <div class="container">
+            <h2>Key Results</h2>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-number">20×</div>
+                    <div class="result-label">Faster Joint Sampling</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-number">6-7×</div>
+                    <div class="result-label">Lower Memory Usage</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-number">10×</div>
+                    <div class="result-label">Faster Training vs TNP-A</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-number">~0%</div>
+                    <div class="result-label">Accuracy Loss</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Abstract -->
+    <section>
+        <div class="container">
+            <h2>Abstract</h2>
+            <div class="abstract-content">
+                <p>Transformer-based models for amortized probabilistic inference, such as neural processes, prior-fitted networks, and tabular foundation models, excel at single-pass <em>marginal</em> prediction. However, many real-world applications require coherent <em>joint distributions</em> that capture dependencies between predictions. While purely autoregressive architectures efficiently generate such distributions, they sacrifice the flexible set-conditioning that makes these models powerful for meta-learning. Conversely, the standard approach to obtain joint distributions from set-based models requires expensive re-encoding of an updated context set at each autoregressive step.</p>
+                <br>
+                <p>We introduce a <strong>causal autoregressive buffer</strong> that preserves the advantages of both paradigms. Our approach decouples context encoding from updating the conditioning set. The model processes the context once and caches it, while a dynamic buffer captures target dependencies: as targets are incorporated, they enter the buffer and attend to both the cached context and previously buffered targets. This enables efficient batched autoregressive generation and one-pass joint predictive density evaluation. Training seamlessly integrates set-based and autoregressive modes at minimal additional cost. Across synthetic functions, EEG signals, cognitive models, and tabular data, our method matches the predictive accuracy of strong baselines while delivering up to <strong>20× faster joint sampling</strong>.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Method -->
+    <section>
+        <div class="container">
+            <h2>Method</h2>
+            <p>Our key insight is to separate the roles of the initial context and predicted targets. We preserve permutation invariance for the initial context (encoded once and cached) while handling target dependencies through a separate causal mechanism.</p>
+
+            <div class="method-visual">
+                <div class="method-card standard">
+                    <h3>
+                        <span class="method-icon"><i class="fas fa-redo"></i></span>
+                        Standard Autoregressive
+                    </h3>
+                    <div class="complexity">\(\mathcal{O}(K(N+K)^2)\) complexity</div>
+                    <p>Re-encodes the entire augmented context set at each step. Each new prediction triggers complete re-computation of the context representation.</p>
+                </div>
+                <div class="method-card ours">
+                    <h3>
+                        <span class="method-icon"><i class="fas fa-bolt"></i></span>
+                        Our Buffered Approach
+                    </h3>
+                    <div class="complexity">\(\mathcal{O}(N^2 + NK + K^2)\) complexity</div>
+                    <p>Encodes context once and caches it. New predictions enter a causal buffer that attends to both the cached context and previous buffer entries.</p>
+                </div>
+            </div>
+
+            <div class="figure-container" style="margin-top: 48px;">
+                <img src="figures/speed_comparison_main_body.png" alt="Speed Comparison">
+                <div class="figure-caption">
+                    <strong>Computational benchmarks.</strong> Wall-clock time (log scale) for sampling, density evaluation, and training, along with peak memory usage versus context points \(N\). Our method closely matches autoregressive baselines in predictive performance while offering significant speedups and lower memory usage.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contributions -->
+    <section>
+        <div class="container">
+            <h2>Contributions</h2>
+            <ul class="contributions-list">
+                <li>
+                    <span class="contribution-num">1</span>
+                    <span class="contribution-text">We introduce the <strong>causal autoregressive buffer</strong>, a mechanism that decouples set-based context encoding from sequential prediction, enabling efficient joint sampling and predictive density evaluation from transformer-based amortized probabilistic models.</span>
+                </li>
+                <li>
+                    <span class="contribution-num">2</span>
+                    <span class="contribution-text">We propose a <strong>unified training strategy</strong> using masked attention and buffer-size curriculum that allows a single model to learn both modes of operation at minimal additional cost.</span>
+                </li>
+                <li>
+                    <span class="contribution-num">3</span>
+                    <span class="contribution-text">We demonstrate that our approach is <strong>broadly applicable</strong> to transformer-based probabilistic models including TNPs/PFNs and tabular foundation models (TabICL), achieving up to 20× speedup while maintaining comparable predictive accuracy across diverse tasks.</span>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Results -->
+    <section>
+        <div class="container">
+            <h2>Experiments</h2>
+            <p>We validate our method across diverse tasks: regression on synthetic functions, interpolation of real-world EEG data, Bayesian model selection on a multisensory perception model, and pre-training of a tabular foundation model.</p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>TNP-D (AR)</th>
+                            <th>TNP-D (Ind)</th>
+                            <th>TNP-A</th>
+                            <th>Ours (K=16)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GP</strong></td>
+                            <td>2.57</td>
+                            <td>2.22</td>
+                            <td>2.24</td>
+                            <td class="highlight-row"><strong>2.51</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sawtooth</strong></td>
+                            <td>1.05</td>
+                            <td>0.94</td>
+                            <td>0.98</td>
+                            <td class="highlight-row"><strong>1.00</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>EEG-Int</strong></td>
+                            <td>0.51</td>
+                            <td>0.36</td>
+                            <td>0.58</td>
+                            <td class="highlight-row"><strong>0.52</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>EEG-For</strong></td>
+                            <td>1.07</td>
+                            <td>-0.74</td>
+                            <td>1.23</td>
+                            <td class="highlight-row"><strong>0.85</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top: 16px; color: var(--text-light); font-size: 0.9rem;">
+                Average predictive density (↑) results on synthetic functions and EEG tasks. Our method (\(K=16\)) achieves comparable performance to the expensive TNP-D (AR) baseline while being up to 20× faster.
+            </p>
+
+            <div class="figure-container" style="margin-top: 48px;">
+                <img src="figures/bav_model_comparison.png" alt="Model Comparison">
+                <div class="figure-caption">
+                    <strong>Multisensory causal inference model comparison.</strong> Log marginal likelihood (LML) comparison for both \(\rho=1\) and \(\rho=\frac{4}{3}\), and LML difference. Our method closely aligns with the ground-truth for Bayesian model selection.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Citation -->
+    <section id="citation">
+        <div class="container">
+            <h2>Citation</h2>
+            <p>If you find this work useful, please cite our paper:</p>
+            <div class="citation-box">
+                <button class="copy-btn" onclick="copyBibtex()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <pre>@inproceedings{hassan2026efficient,
+  title={Efficient Autoregressive Inference for Transformer Probabilistic Models},
+  author={Conor Hassan and Nasrulloh Loka and Cen-You Li and Daolang Huang and Paul E. Chang and Yang Yang and Francesco Silvestrin and Samuel Kaski and Luigi Acerbi},
+  booktitle={The Fourteenth International Conference on Learning Representations},
+  year={2026},
+  url={https://arxiv.org/abs/2510.09477},
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+        </div>
+    </footer>
+
+    <script>
+        function copyBibtex() {
+            const bibtex = `@inproceedings{hassan2026efficient,
+  title={Efficient Autoregressive Inference for Transformer Probabilistic Models},
+  author={Conor Hassan and Nasrulloh Loka and Cen-You Li and Daolang Huang and Paul E. Chang and Yang Yang and Francesco Silvestrin and Samuel Kaski and Luigi Acerbi},
+  booktitle={The Fourteenth International Conference on Learning Representations},
+  year={2026},
+  url={https://arxiv.org/abs/2510.09477},
+}`;
+            navigator.clipboard.writeText(bibtex).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                }, 2000);
+            });
+        }
+
+        // Simple scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section > .container > *').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
