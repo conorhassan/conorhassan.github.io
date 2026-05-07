@@ -2,7 +2,7 @@
 title: "About"
 ---
 
-![](mug.png){style="float:right; width:200px; margin:10px; padding:5px;"}
+![](cartoon-mug.png){style="float:right; width:200px; margin:10px; padding:5px;"}
 
 I am a PhD student at the [QUT Centre for Data Science](https://research.qut.edu.au/qutcds/) (in Brisbane, Australia) working with Distinguished Professor [Kerrie Mengersen](https://research.qut.edu.au/qutcds/staff/kerrie-mengersen/) on methods for [*Bayesian federated learning*](https://arxiv.org/abs/2302.03314) and [*differentially private generative models*](https://arxiv.org/abs/2307.15424). My thesis is currently under internal review. 
 

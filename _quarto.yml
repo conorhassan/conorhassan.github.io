@@ -4,11 +4,11 @@ project:
 
 website:
   title: "Conor Hassan"
-  description: "Statistics and Machine Learning Researcher"
-  image: mug.jpeg
+  description: "Machine Learning and Quantitative Researcher and Engineer"
+  image: cartoon-mug.png
 
   navbar:
-    logo: mug.jpeg
+    logo: cartoon-mug.png
     left:
       - href: about.qmd
         text: About
@@ -42,6 +42,5 @@ format:
     theme: pulse
     css: styles.css
     toc: true
-
 
 
