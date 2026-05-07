@@ -1,15 +1,15 @@
 ---
-title: "About"
+title: "Conor Hassan"
 ---
 
-![](cartoon-mug.png){style="float:right; width:200px; margin:10px; padding:5px;"}
+![](cartoon-mug.png){style="float:right; width:180px; margin:10px; padding:5px;"}
 
-I am a PhD student at the [QUT Centre for Data Science](https://research.qut.edu.au/qutcds/) (in Brisbane, Australia) working with Distinguished Professor [Kerrie Mengersen](https://research.qut.edu.au/qutcds/staff/kerrie-mengersen/) on methods for [*Bayesian federated learning*](https://arxiv.org/abs/2302.03314) and [*differentially private generative models*](https://arxiv.org/abs/2307.15424). My thesis is currently under internal review. 
+Machine Learning and Quantitative Researcher and Engineer.
 
-From May to November 2024, I am relocating to Melbourne to complete an internship with the machine learning research team at Amazon. 
+## Selected Publications
 
-My research interests include variational inference, generative models, federated and distributed algorithms, latent-variable models, and Bayesian deep learning.
-
-In the past, I have worked as a research data scientist at [WearOptimo](https://www.wearoptimo.com/), a biotechnology startup developing microwearable devices, and completed internships in [quantitative trading](https://www.imc.com/), [consulting](https://ey.com) and at a [national scientific institute](https://www.agresearch.co.nz/). I have also worked as a research assistant and tutored seven courses in mathematics and statistics, from beginner to Master's level. I am well-versed in using automatic differentiation libraries like *JAX* and *PyTorch*, as well as probabilistic programming libraries such as *NumPyro*, *PyMC*, *Pyro*, and *Stan*.
-
-Contact me at [conorhassan.ai@gmail.com](conorhassan.ai@gmail.com) and connect with me on [LinkedIn](https://www.linkedin.com/in/conorhassan/), [X](https://twitter.com/HassanConor), and [GitHub](https://github.com/conorhassan)!
+- *"In-Context Multi-Objective Optimization."* [↗](https://arxiv.org/abs/2512.11114) ICLR 2026.
+- *"Efficient Autoregressive Inference for Transformer Probabilistic Models."* [↗](https://arxiv.org/abs/2510.09477) ICLR 2026.
+- *"Federated Variational Inference Methods for Structured Latent Variable Models."* [↗](https://arxiv.org/abs/2302.03314) arXiv preprint arXiv:2302.03314 (2024).
+- *"Deep Generative Models, Synthetic Tabular Data, and Differential Privacy: An Overview and Synthesis."* [↗](https://arxiv.org/abs/2307.15424) arXiv preprint arXiv:2307.15424 (2024).
+- *"Being Bayesian in the 2020s: opportunities and challenges in the practice of modern applied Bayesian statistics."* [↗](https://royalsocietypublishing.org/doi/10.1098/rsta.2022.0156) Philosophical Transactions of the Royal Society A (2023).

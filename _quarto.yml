@@ -10,8 +10,6 @@ website:
   navbar:
     logo: cartoon-mug.png
     left:
-      - href: about.qmd
-        text: About
       - href: publications.qmd
         text: Publications
       - href: resume.qmd
@@ -42,5 +40,4 @@ format:
     theme: pulse
     css: styles.css
     toc: true
-
 
